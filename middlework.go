@@ -12,7 +12,7 @@ func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName strin
 		load:=`{
 			"name":"`+v+`",
 			"businessUid": "`+userId+`",
-			"noofparkingslots": "0"
+			"deliveryInZone": "0"
 			}`
 		loadToJson:=byteToJsonInterface(load)
 		_=shashankMongo.InsertOne(dBConnect,collectionName,loadToJson)
