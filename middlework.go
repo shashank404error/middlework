@@ -6,7 +6,7 @@ import(
 	"github.com/shashank404error/shashankMongo"
 )
 
-func CreateZones(dBConnect *shashankMongo.ConnectToDataBase, userId string, config *shashankMongo.ProfileConfig) {
+func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName string, userId string, config *shashankMongo.ProfileConfig) {
 	for _,v := range config.ZoneID {
 		
 		load:=`{
@@ -15,7 +15,7 @@ func CreateZones(dBConnect *shashankMongo.ConnectToDataBase, userId string, conf
 			"noofparkingslots": 0
 			}`
 		loadToJson:=byteToJsonInterface(load)
-		_=shashankMongo.InsertOne(dBConnect,loadToJson)
+		_=shashankMongo.InsertOne(dBConnect,collectionName,loadToJson)
 	}
 }
 
