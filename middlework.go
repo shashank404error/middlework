@@ -59,7 +59,7 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 		count = count + 1
 	}
 	countString := strconv.Itoa(count)
-
+    shashankMongo.GetFieldByID(dBConnect,collectionName,userId)
 	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
 	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
 	return res1,res2
