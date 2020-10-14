@@ -35,6 +35,7 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 			return
 		}
 	var arrOfDeliveryDetail []shashankMongo.DeliveryDetail	
+	var count int
 	for _, row := range rows {
 		latitudeFloat, err := strconv.ParseFloat(row[3], 64); 
 		if err != nil {
@@ -55,9 +56,15 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 			LongLat: row[4]+","+row[3],
 		}
 		arrOfDeliveryDetail = append(arrOfDeliveryDetail,deliveryDetail)
+		count = count + 1
 	}
-	res:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
-	fmt.Println(res)
+	fmt.Println(count)
+	countString := strconv.Itoa(count)
+
+	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
+	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
+	fmt.Println(res1)
+	fmt.Println(res2)
 }
 
 
