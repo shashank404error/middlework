@@ -26,16 +26,16 @@ func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName strin
 	}
 }
 
-func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,collectionName string, userId string) (int64, int64){
+func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,collectionName string, userId string) (int64, int64, string){
 	f, err := excelize.OpenReader(file)
 	if err != nil {
 		fmt.Println(err)
-		return 0,0
+		return 0,0,""
 	}
 	rows := f.GetRows("Sheet1")
 		if err != nil {
 			fmt.Println(err)
-			return 0,0
+			return 0,0,""
 		}
 	var arrOfDeliveryDetail []shashankMongo.DeliveryDetail	
 	var count int
@@ -43,12 +43,12 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 		latitudeFloat, err := strconv.ParseFloat(row[3], 64); 
 		if err != nil {
 			fmt.Println(err) 
-			return 0,0
+			return 0,0,""
 		}
 		longitudeFloat, err := strconv.ParseFloat(row[4], 64); 
 		if err != nil {
 			fmt.Println(err) 
-			return 0,0
+			return 0,0,""
 		}
 		deliveryDetail:=shashankMongo.DeliveryDetail{
 			CustomerName: row[0], 
@@ -70,14 +70,14 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 	oldCount, err := strconv.Atoi(zoneInfo.DeliveryInZone)
 	if err != nil {
 		fmt.Println(err)
-		return 0,0
+		return 0,0,""
 	}
 	newCount:=count+oldCount
 	countString := strconv.Itoa(newCount)
 	
 	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
 	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
-	return res1,res2
+	return res1,res2,zoneInfo.BusinessUID
 }
 
 
