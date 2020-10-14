@@ -94,7 +94,7 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 	return res1,res2,zoneInfo.BusinessUID
 }
 
-func sortZoneInfo(zoneInfo *shashankMongo.ZoneInfo ,userLong string, userLat string,token string) *shashankMongo.ZoneInfo {
+func SortZoneInfo(zoneInfo *shashankMongo.ZoneInfo ,userLong string, userLat string,token string) *shashankMongo.ZoneInfo {
 	
 	var arrOfDeliveryDetail []shashankMongo.DeliveryDetail
 	n,err:=strconv.Atoi(zoneInfo.DeliveryInZone)
