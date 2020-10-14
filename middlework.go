@@ -3,6 +3,7 @@ package middlework
 import(
 	"log"
 	"io"
+	"strconv"
 	"fmt"
 	"encoding/json"
 	"github.com/shashank404error/shashankMongo"
@@ -23,10 +24,6 @@ func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName strin
 }
 
 func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,collectionName string, userId string) {
-
-	//fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-    //fmt.Printf("File Size: %+v\n", handler.Size)
-	//fmt.Printf("MIME Header: %+v\n", handler.Header)
 	f, err := excelize.OpenReader(file)
 	if err != nil {
 		fmt.Println(err)
@@ -37,14 +34,30 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 			fmt.Println(err)
 			return
 		}
+	var arrOfDeliveryDetail []shashankMongo.DeliveryDetail	
 	for _, row := range rows {
-		fmt.Println(row[0])
-		fmt.Println(row[1])
-		fmt.Println(row[2])
-		fmt.Println(row[3])
-		fmt.Println(row[4])
-		fmt.Println("\n")
+		latitudeFloat, err := strconv.ParseFloat(row[3], 64); 
+		if err != nil {
+			fmt.Println(err) 
+			return
+		}
+		longitudeFloat, err := strconv.ParseFloat(row[4], 64); 
+		if err != nil {
+			fmt.Println(err) 
+			return
+		}
+		deliveryDetail:=shashankMongo.DeliveryDetail{
+			CustomerName: row[0], 
+			CustomerMob: row[1],
+			Address: row[2],
+			Latitude: latitudeFloat,
+			Longitude: longitudeFloat,
+			LongLat: row[4]+","+row[3],
+		}
+		arrOfDeliveryDetail = append(arrOfDeliveryDetail,deliveryDetail)
 	}
+	res:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
+	fmt.Println(res)
 }
 
 
