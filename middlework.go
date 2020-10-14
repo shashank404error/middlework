@@ -55,6 +55,7 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 			CustomerName: row[0], 
 			CustomerMob: row[1],
 			Address: row[2],
+			PicURL:"/static/images/userNotLogged.jpg",
 			Latitude: latitudeFloat,
 			Longitude: longitudeFloat,
 			LongLat: row[4]+","+row[3],
