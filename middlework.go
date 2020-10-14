@@ -7,8 +7,11 @@ import(
 	"fmt"
 	"encoding/json"
 	"github.com/shashank404error/shashankMongo"
+	"go.mongodb.org/mongo-driver/bson"
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
+
+var zoneInfo shashankMongo.ZoneInfo
 
 func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName string, userId string, config *shashankMongo.ProfileConfig) {
 	for _,v := range config.ZoneID {
@@ -59,7 +62,12 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 		count = count + 1
 	}
 	countString := strconv.Itoa(count)
-    shashankMongo.GetFieldByID(dBConnect,collectionName,userId)
+	resultDocument:=shashankMongo.GetFieldByID(dBConnect,collectionName,userId)
+	
+	bsonBytes, _ := bson.Marshal(resultDocument)
+	bson.Unmarshal(bsonBytes, &zoneInfo)
+	fmt.Println(zoneInfo)
+	
 	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
 	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
 	return res1,res2
