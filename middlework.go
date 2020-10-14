@@ -61,12 +61,19 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 		arrOfDeliveryDetail = append(arrOfDeliveryDetail,deliveryDetail)
 		count = count + 1
 	}
-	countString := strconv.Itoa(count)
+	
 	resultDocument:=shashankMongo.GetFieldByID(dBConnect,collectionName,userId)
 	
 	bsonBytes, _ := bson.Marshal(resultDocument)
 	bson.Unmarshal(bsonBytes, &zoneInfo)
-	fmt.Println(zoneInfo)
+
+	oldCount, err := strconv.Atoi(zoneInfo.DeliveryInZone)
+	if err != nil {
+		fmt.Println(err)
+		return 0,0
+	}
+	newCount:=count+oldCount
+	countString := strconv.Itoa(newCount)
 	
 	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
 	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
