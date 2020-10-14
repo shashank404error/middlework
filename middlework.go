@@ -5,6 +5,10 @@ import(
 	"io"
 	"strconv"
 	"fmt"
+	"sort"
+	"math"
+	"io/ioutil"
+	"net/http"
 	"encoding/json"
 	"github.com/shashank404error/shashankMongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,6 +16,12 @@ import(
 )
 
 var zoneInfo shashankMongo.ZoneInfo
+
+type DistanceSorter []shashankMongo.DeliveryDetail //Interface to implement sorting of distance
+
+func (a DistanceSorter) Len() int           { return len(a) }
+func (a DistanceSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a DistanceSorter) Less(i, j int) bool { return a[i].DistanceFromYou < a[j].DistanceFromYou }
 
 func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName string, userId string, config *shashankMongo.ProfileConfig) {
 	for _,v := range config.ZoneID {
@@ -82,6 +92,44 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
 	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
 	return res1,res2,zoneInfo.BusinessUID
+}
+
+func sortZoneInfo(zoneInfo *shashankMongo.ZoneInfo ,userLong string, userLat string,token string) *shashankMongo.ZoneInfo {
+	
+	var arrOfDeliveryDetail []shashankMongo.DeliveryDetail
+	n,err:=strconv.Atoi(zoneInfo.DeliveryInZone)
+	if err!=nil {
+		log.Fatal(err)
+	}
+	for i := 0; i < n; i++ {
+		var result shashankMongo.MapBoxResp
+		resp, err := http.Get("https://api.mapbox.com/directions/v5/mapbox/driving/"+userLong+","+userLat+";"+zoneInfo.DeliveryDetail[i].LongLat+"?access_token="+token)
+		if err != nil{
+			log.Fatal(err)
+		}
+
+		defer resp.Body.Close()
+		data, _ := ioutil.ReadAll(resp.Body)
+		json.Unmarshal(data,&result)
+		dis :=  math.Round(((result.Routes[0].Distance)/1000)*100)/100
+		dur :=  math.Round(((result.Routes[0].Duration)/3600)*100)/100
+		delivery:=shashankMongo.DeliveryDetail{
+			Address: zoneInfo.DeliveryDetail[i].Address, 
+			DistanceFromYou: dis,
+			ETA: dur,
+			PicURL: zoneInfo.DeliveryDetail[i].PicURL,
+			LongLat: zoneInfo.DeliveryDetail[i].LongLat,
+			CustomerName: zoneInfo.DeliveryDetail[i].CustomerName,
+			CustomerMob: zoneInfo.DeliveryDetail[i].CustomerMob,
+			Latitude: zoneInfo.DeliveryDetail[i].Latitude,
+			Longitude: zoneInfo.DeliveryDetail[i].Longitude,
+		}
+		arrOfDeliveryDetail = append(arrOfDeliveryDetail,delivery)
+	}
+
+	sort.Sort(DistanceSorter(arrOfDeliveryDetail))
+	zoneInfo.DeliveryDetail = arrOfDeliveryDetail
+	return zoneInfo
 }
 
 
