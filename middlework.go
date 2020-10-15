@@ -34,7 +34,7 @@ func CreateZones(dBConnect *shashankMongo.ConnectToDataBase,collectionName strin
 			"longitude":"77.471906",
 			"latitude":"23.160734"
 			}`
-		loadToJson:=byteToJsonInterface(load)
+		loadToJson:=ByteToJsonInterface(load)
 		_=shashankMongo.InsertOne(dBConnect,collectionName,loadToJson)
 	}
 }
@@ -133,7 +133,7 @@ func SortZoneInfo(zoneInfo *shashankMongo.ZoneInfo ,userLong string, userLat str
 }
 
 
-func byteToJsonInterface(load string) map[string]interface{} {
+func ByteToJsonInterface(load string) map[string]interface{} {
 	var loadArr = []byte(load)
     var loadToJson map[string]interface{}
     err := json.Unmarshal(loadArr, &loadToJson)
