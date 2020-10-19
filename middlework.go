@@ -86,9 +86,20 @@ func UploadToExcel(file io.Reader,dBConnect *shashankMongo.ConnectToDataBase,col
 		fmt.Println(err)
 		return 0,0,""
 	}
+
 	newCount:=count+oldCount
 	countString := strconv.Itoa(newCount)
-	
+
+	businessAccount:=shashankMongo.FetchProfile(dBConnect, "businessAccounts", zoneInfo.BusinessUID)
+	totalPending, err := strconv.Atoi(businessAccount.DeliveryPending)
+	if err != nil {
+		fmt.Println(err)
+		return 0,0,""
+	}
+	newPending:= totalPending+count
+	newPendingString := strconv.Itoa(newPending)
+	_=shashankMongo.UpdateOneByID(dBConnect,"businessAccounts",zoneInfo.BusinessUID,"deliveryPending",newPendingString)	
+
 	res1:=shashankMongo.UpdateDeliveryInfo(dBConnect,collectionName,userId,arrOfDeliveryDetail)
 	res2:=shashankMongo.UpdateOneByID(dBConnect,collectionName,userId,"deliveryInZone", countString)
 	return res1,res2,zoneInfo.BusinessUID
