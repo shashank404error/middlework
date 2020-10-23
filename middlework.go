@@ -13,7 +13,6 @@ import(
 	"github.com/shashank404error/shashankMongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"github.com/360EntSecGroup-Skylar/excelize"
-	"github.com/pubnub/go"
 )
 
 var zoneInfo shashankMongo.ZoneInfo
@@ -144,30 +143,6 @@ func SortZoneInfo(zoneInfo *shashankMongo.ZoneInfo ,userLong string, userLat str
 	return zoneInfo
 }
 
-func CreatePubnubChannel(pubnubCred *shashankMongo.PubnubCredentials,channelName string) {
-	config := pubnub.NewConfig()
-    config.SubscribeKey = pubnubCred.SubscribeKey
-    config.PublishKey = pubnubCred.PublishKey
-	config.UUID = pubnubCred.UUIDPubnub
-	
-	pn := pubnub.NewPubNub(config)
-   //   doneConnect := make(chan bool)
-	donePublish := make(chan bool)
-	
-	msg := map[string]interface{}{
-		"lat": "0",
-		"lng":"0",
-	}
-	response, status, err := pn.Publish().Channel(channelName).Message(msg).Execute()
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(response, status, err)
-
-	<-donePublish
-}
 
 
 func ByteToJsonInterface(load string) map[string]interface{} {
