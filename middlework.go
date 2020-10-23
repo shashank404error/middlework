@@ -144,7 +144,7 @@ func SortZoneInfo(zoneInfo *shashankMongo.ZoneInfo ,userLong string, userLat str
 	return zoneInfo
 }
 
-func CreatePubnubChannel(pubnubCred shashankMongo.PubnubCredentials,channelName string) {
+func CreatePubnubChannel(pubnubCred *shashankMongo.PubnubCredentials,channelName string) {
 	config := pubnub.NewConfig()
     config.SubscribeKey = pubnubCred.SubscribeKey
     config.PublishKey = pubnubCred.PublishKey
